@@ -1,0 +1,27 @@
+{
+  "filas": 492552,
+  "columnas": [
+    "Cliente",
+    "RFM Combinado",
+    "Negocio Principal",
+    "Co_Compra_REVESTIMIENTOS_E_INSTALACIÓN_x_COCINAS",
+    "Co_Compra_REVESTIMIENTOS_E_INSTALACIÓN_x_PINTURAS_E_IMPERMEABILIZANTES",
+    "Co_Compra_REVESTIMIENTOS_E_INSTALACIÓN_x_BAÑOS",
+    "Co_Compra_COCINAS_x_PINTURAS_E_IMPERMEABILIZANTES",
+    "Co_Compra_COCINAS_x_BAÑOS",
+    "Co_Compra_PINTURAS_E_IMPERMEABILIZANTES_x_BAÑOS",
+    "Co_Compra_BAÑOS_x_SERVICIOS",
+    "Items Promedio Por Pedido",
+    "Promedio Negocios Por Pedido",
+    "Dias antiguedad",
+    "Intervalo_Promedio_Dias",
+    "Municipios_Distintos",
+    "Puntos_Venta_Distintos",
+    "Asesores_Distintos",
+    "% Gasto COCINAS",
+    "% Gasto PINTURAS E IMPERMEABILIZANTES",
+    "% Gasto BAÑOS",
+    "Puntaje R",
+    "Puntaje M"
+  ]
+}

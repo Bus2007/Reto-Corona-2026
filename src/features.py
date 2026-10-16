@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from itertools import combinations
@@ -77,7 +79,7 @@ def discretizar_RFM(df_RFM):
 
     df_discretizado["RFM Ponderado"] = ((df_discretizado["Puntaje R"]*0.4)+(df_discretizado["Puntaje F"]*0.2)
                                         +(df_discretizado["Puntaje M"]*0.4))
-    print(df_discretizado.head(5))
+    #print(df_discretizado.head(5))
     return df_discretizado
 
 
@@ -95,7 +97,7 @@ def share_of_wallet(df):
     sow.columns = [f"% Gasto {col}" for col in sow.columns]
     sow["Negocio Principal"] = gasto_negocio.idxmax(axis=1)
     
-    print(sow.sample(5))
+    #print(sow.sample(5))
     return sow.reset_index()
 
 def indice_IHH(df_sow):
@@ -104,7 +106,7 @@ def indice_IHH(df_sow):
     df_ihh["Cliente"] = df_sow["Cliente"]
     df_ihh["Indice IHH"] = (df_sow[columnas_pct]**2).sum(axis=1)
     
-    print(df_ihh.sample(5))
+    #print(df_ihh.sample(5))
     return df_ihh
 
 def intensidad_intercategoria(df):
@@ -189,7 +191,7 @@ def canales_y_geografia(df):
 
 def construir_matriz_features(df):
     """
-    Unifica todas las dimensiones extraídas en un único DataFrame por Cliente.
+    Unifica todas las dimensiones extraídas en un unico DataFrame por Cliente.
     """
     df_rfm = discretizar_RFM(matriz_RFM(df))
     df_sow = share_of_wallet(df)
@@ -207,5 +209,61 @@ def construir_matriz_features(df):
     )
     return df_features
 
-df_matriz_final = construir_matriz_features(df)
-print(f"Filas: {df_matriz_final.shape[0]}, Columnas Totales: {df_matriz_final.shape[1]}, Nombre de Columnas: {df_matriz_final.columns.tolist()}")
+
+#=====================================
+# EXPORTACION DE LA MATRIZ DE FEATURES
+#=====================================
+
+import json
+from pathlib import Path
+
+# Ruta de salida relativa a la ubicacion de este archivo .py
+CARPETA_SCRIPT = Path(__file__).resolve().parent
+
+RUTA_DATOS = (
+    CARPETA_SCRIPT / "../Datos/feature_eng/features_init"
+).resolve()
+
+RUTA_DATOS.mkdir(parents=True, exist_ok=True)
+
+NOMBRE_BASE = "matriz_features_clientes"
+
+ruta_csv = RUTA_DATOS / f"{NOMBRE_BASE}.csv"
+ruta_parquet = RUTA_DATOS / f"{NOMBRE_BASE}.parquet"
+ruta_meta = RUTA_DATOS / f".{NOMBRE_BASE}.meta.json"
+
+
+def exportar_base_unificada(df):
+    meta_actual = {
+        "filas": len(df),
+        "columnas": list(df.columns)
+    }
+
+    print("\n=====================================")
+    print("EXPORTACION DE LA MATRIZ DE FEATURES")
+    print("=====================================")
+    print(f"Carpeta de salida: {RUTA_DATOS}")
+    print(f"Filas: {len(df):,}")
+    print(f"Columnas: {len(df.columns)}")
+
+    try:
+        df.to_csv(ruta_csv, sep=";", index=False, encoding="utf-8-sig", date_format="%Y-%m-%d")
+        print(f"CSV guardado correctamente: {ruta_csv}")
+
+        df.to_parquet(ruta_parquet, index=False)
+        print(f"Parquet guardado correctamente: {ruta_parquet}")
+
+        ruta_meta.write_text(json.dumps(meta_actual, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"Metadatos guardados: {ruta_meta}")
+        print("Exportacion completada correctamente.")
+
+    except Exception as e:
+        print(f"\nERROR DURANTE LA EXPORTACION: {e}")
+        raise
+
+print("Iniciando construccion de la matriz de features...")
+
+df_features = construir_matriz_features(df)
+print(f"Matriz construida: {df_features.shape}")
+
+exportar_base_unificada(df_features)
